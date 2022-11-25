@@ -14,7 +14,7 @@ function App() {
 
   const [name, setName] = useState<Country[]>([]);
 
-  const [nameBorders, setNameBorders] = useState<string[]>([]);
+  const [nameBorders, setNameBorders] = useState<string[]>(['Chouse the country']);
 
 
 
@@ -31,25 +31,30 @@ function App() {
   }, []);
 
 
-  const enterToConsole = async (code: string) => {
+  const enterBorders = async (code: string) => {
     setNameBorders([])
     const responseCode = await axios.get(UrlWithcode + code);
 
     const borders = responseCode.data.borders;
 
-    for (let i = 0; i < borders.length; i++) {
-      const countryBorders = await axios.get(UrlWithcode + borders[i]);
-      setNameBorders(prev => [...prev, countryBorders.data.name]);
+    if (borders !== undefined) {
+      for (let i = 0; i < borders.length; i++) {
+        const countryBorders = await axios.get(UrlWithcode + borders[i]);
+        setNameBorders(prev => [...prev, countryBorders.data.name]);
+      }
+    } else {
+      setNameBorders(['This country do not have borders'])
     }
   };
 
   const createCountrys = name.map(createCountry => {
-    return <p key={createCountry.alpha3Code} onClick={() => enterToConsole(createCountry.alpha3Code)}>{createCountry.name}</p>
+    return <p key={createCountry.alpha3Code} onClick={() => enterBorders(createCountry.alpha3Code)}>{createCountry.name}</p>
   });
 
   const createBorders = nameBorders.map(nameBorder => {
     return <li key={Math.random()}>{nameBorder}</li>
   })
+
 
   return (
     <div className="App">
@@ -59,8 +64,7 @@ function App() {
       <div>
         <Info>{createBorders}</Info>
       </div>
-    </div>
-  );
-}
+    </div>)
+};
 
 export default App;
